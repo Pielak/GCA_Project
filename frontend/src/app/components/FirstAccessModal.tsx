@@ -20,8 +20,8 @@ export const FirstAccessModal: React.FC<FirstAccessModalProps> = ({
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
 
   const validatePasswordStrength = (password: string): { valid: boolean; message: string } => {
-    if (password.length < 12) {
-      return { valid: false, message: 'Mínimo 12 caracteres' };
+    if (password.length < 10) {
+      return { valid: false, message: 'Mínimo 10 caracteres' };
     }
     if (!/[A-Z]/.test(password)) {
       return { valid: false, message: 'Deve conter letra maiúscula' };
@@ -117,16 +117,16 @@ export const FirstAccessModal: React.FC<FirstAccessModalProps> = ({
 
         <div
           style={{
-            backgroundColor: '#fef3c7',
-            border: '1px solid #f59e0b',
-            color: '#92400e',
+            backgroundColor: '#f0fdf4',
+            border: '1px solid #10b981',
+            color: '#047857',
             padding: '12px',
             borderRadius: '8px',
             marginBottom: '24px',
             fontSize: '13px',
           }}
         >
-          <strong>⚠️ Importante:</strong> Esta ação é obrigatória e você será forçado a fazer isso agora.
+          <strong>🔒 Segurança:</strong> Esta ação é obrigatória e você será forçado a fazer isso agora.
         </div>
 
         {error && (
@@ -154,7 +154,7 @@ export const FirstAccessModal: React.FC<FirstAccessModalProps> = ({
               type="password"
               value={newPassword}
               onChange={e => setNewPassword(e.target.value)}
-              placeholder="Mínimo 12 caracteres, 1 maiúscula, 1 número, 1 caractere especial"
+              placeholder="Mínimo 10 caracteres, 1 maiúscula, 1 número, 1 caractere especial"
               style={{
                 width: '100%',
                 padding: '12px',
@@ -218,7 +218,7 @@ export const FirstAccessModal: React.FC<FirstAccessModalProps> = ({
             style={{
               width: '100%',
               padding: '12px',
-              backgroundColor: '#16a34a',
+              backgroundColor: '#7c3aed',
               color: 'white',
               border: 'none',
               borderRadius: '8px',

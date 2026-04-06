@@ -90,8 +90,8 @@ export const ResetPasswordPage: React.FC = () => {
   };
 
   const validatePasswordStrength = (password: string): { valid: boolean; message: string } => {
-    if (password.length < 12) {
-      return { valid: false, message: 'Mínimo 12 caracteres' };
+    if (password.length < 10) {
+      return { valid: false, message: 'Mínimo 10 caracteres' };
     }
     if (!/[A-Z]/.test(password)) {
       return { valid: false, message: 'Deve conter letra maiúscula' };
@@ -218,7 +218,7 @@ export const ResetPasswordPage: React.FC = () => {
             style={{
               width: '100%',
               padding: '12px',
-              backgroundColor: '#60a5fa',
+              backgroundColor: '#7c3aed',
               color: 'white',
               border: 'none',
               borderRadius: '8px',
@@ -231,7 +231,7 @@ export const ResetPasswordPage: React.FC = () => {
           </button>
 
           <p style={{ textAlign: 'center', marginTop: '20px', color: '#666', fontSize: '12px' }}>
-            Lembrou sua senha? <a href="/login" style={{ color: '#60a5fa' }}>Faça login</a>
+            Lembrou sua senha? <a href="/login" style={{ color: '#7c3aed' }}>Faça login</a>
           </p>
         </form>
       )}
@@ -246,7 +246,7 @@ export const ResetPasswordPage: React.FC = () => {
               type="password"
               value={state.newPassword}
               onChange={e => setState(prev => ({ ...prev, newPassword: e.target.value }))}
-              placeholder="Mínimo 12 caracteres"
+              placeholder="Mínimo 10 caracteres, 1 maiúscula, 1 número, 1 caractere especial"
               style={{
                 width: '100%',
                 padding: '12px',
@@ -311,7 +311,7 @@ export const ResetPasswordPage: React.FC = () => {
             style={{
               width: '100%',
               padding: '12px',
-              backgroundColor: '#16a34a',
+              backgroundColor: '#7c3aed',
               color: 'white',
               border: 'none',
               borderRadius: '8px',

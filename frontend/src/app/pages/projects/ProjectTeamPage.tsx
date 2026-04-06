@@ -256,7 +256,7 @@ export const ProjectTeamPage: React.FC = () => {
               disabled={inviteForm.loading || !inviteForm.email}
               style={{
                 padding: '10px 20px',
-                backgroundColor: '#60a5fa',
+                backgroundColor: '#7c3aed',
                 color: 'white',
                 border: 'none',
                 borderRadius: '8px',
@@ -341,8 +341,8 @@ export const ProjectTeamPage: React.FC = () => {
                   <span
                     style={{
                       display: 'inline-block',
-                      backgroundColor: '#fef3c7',
-                      color: '#92400e',
+                      backgroundColor: '#ede9fe',
+                      color: '#6d28d9',
                       padding: '4px 12px',
                       borderRadius: '6px',
                       fontSize: '12px',
