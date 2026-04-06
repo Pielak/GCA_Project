@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Lock, CheckCircle2, AlertCircle, Shield } from 'lucide-react';
+import { Lock, CheckCircle2, AlertCircle, Shield, Eye, EyeOff } from 'lucide-react';
 
 interface FirstAccessModalProps {
   isOpen: boolean;
@@ -15,6 +15,8 @@ export const FirstAccessModal: React.FC<FirstAccessModalProps> = ({
 }) => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -123,13 +125,13 @@ export const FirstAccessModal: React.FC<FirstAccessModalProps> = ({
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-violet-500" />
               <input
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 value={newPassword}
                 onChange={e => setNewPassword(e.target.value)}
                 placeholder="Mínimo 10 caracteres"
                 disabled={loading}
                 required
-                className={`w-full pl-10 pr-4 py-2.5 text-sm rounded-lg border-2 bg-dark-200 transition-all focus:outline-none ${
+                className={`w-full pl-10 pr-10 py-2.5 text-sm rounded-lg border-2 bg-dark-200 transition-all focus:outline-none ${
                   newPassword.length === 0
                     ? 'border-dark-200 text-gray-300 placeholder-gray-600'
                     : passwordValidation.valid
@@ -137,6 +139,17 @@ export const FirstAccessModal: React.FC<FirstAccessModalProps> = ({
                     : 'border-red-500 text-white'
                 }`}
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-violet-500 hover:text-violet-400 transition-colors"
+              >
+                {showPassword ? (
+                  <EyeOff className="w-4 h-4" />
+                ) : (
+                  <Eye className="w-4 h-4" />
+                )}
+              </button>
             </div>
 
             {/* Password Requirements */}
@@ -202,21 +215,34 @@ export const FirstAccessModal: React.FC<FirstAccessModalProps> = ({
             <label className="block text-sm font-semibold text-white mb-2">
               Confirmar Senha
             </label>
-            <input
-              type="password"
-              value={confirmPassword}
-              onChange={e => setConfirmPassword(e.target.value)}
-              placeholder="Repita a senha"
-              disabled={loading}
-              required
-              className={`w-full px-4 py-2.5 text-sm rounded-lg border-2 bg-dark-200 transition-all focus:outline-none ${
-                confirmPassword.length === 0
-                  ? 'border-dark-200 text-gray-300 placeholder-gray-600'
-                  : passwordsMatch
-                  ? 'border-emerald-500 text-white'
-                  : 'border-red-500 text-white'
-              }`}
-            />
+            <div className="relative">
+              <input
+                type={showConfirmPassword ? 'text' : 'password'}
+                value={confirmPassword}
+                onChange={e => setConfirmPassword(e.target.value)}
+                placeholder="Repita a senha"
+                disabled={loading}
+                required
+                className={`w-full pl-4 pr-10 py-2.5 text-sm rounded-lg border-2 bg-dark-200 transition-all focus:outline-none ${
+                  confirmPassword.length === 0
+                    ? 'border-dark-200 text-gray-300 placeholder-gray-600'
+                    : passwordsMatch
+                    ? 'border-emerald-500 text-white'
+                    : 'border-red-500 text-white'
+                }`}
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-violet-500 hover:text-violet-400 transition-colors"
+              >
+                {showConfirmPassword ? (
+                  <EyeOff className="w-4 h-4" />
+                ) : (
+                  <Eye className="w-4 h-4" />
+                )}
+              </button>
+            </div>
             {confirmPassword.length > 0 && !passwordsMatch && (
               <p className="mt-2 text-xs text-red-400 font-medium">As senhas não correspondem</p>
             )}

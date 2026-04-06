@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Lock, Mail, CheckCircle2, AlertCircle, ArrowLeft } from 'lucide-react';
+import { Lock, Mail, CheckCircle2, AlertCircle, ArrowLeft, Eye, EyeOff } from 'lucide-react';
 
 interface ResetPasswordState {
   step: 'request' | 'verify' | 'confirm';
@@ -17,6 +17,8 @@ interface ResetPasswordState {
 export const ResetPasswordPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [state, setState] = useState<ResetPasswordState>({
     step: searchParams.get('token') ? 'verify' : 'request',
     email: '',
@@ -234,13 +236,13 @@ export const ResetPasswordPage: React.FC = () => {
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-violet-500" />
                 <input
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   value={state.newPassword}
                   onChange={e => setState(prev => ({ ...prev, newPassword: e.target.value }))}
                   placeholder="Mínimo 10 caracteres"
                   disabled={state.loading}
                   required
-                  className={`w-full pl-10 pr-4 py-2.5 text-sm rounded-lg border-2 bg-dark-200 transition-all focus:outline-none ${
+                  className={`w-full pl-10 pr-10 py-2.5 text-sm rounded-lg border-2 bg-dark-200 transition-all focus:outline-none ${
                     state.newPassword.length === 0
                       ? 'border-dark-200 text-gray-300 placeholder-gray-600'
                       : validatePasswordStrength(state.newPassword).valid
@@ -248,6 +250,17 @@ export const ResetPasswordPage: React.FC = () => {
                       : 'border-red-500 text-white'
                   }`}
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-violet-500 hover:text-violet-400 transition-colors"
+                >
+                  {showPassword ? (
+                    <EyeOff className="w-4 h-4" />
+                  ) : (
+                    <Eye className="w-4 h-4" />
+                  )}
+                </button>
               </div>
 
               {state.newPassword && (
@@ -271,21 +284,34 @@ export const ResetPasswordPage: React.FC = () => {
               <label className="block text-sm font-semibold text-white mb-2">
                 Confirmar Senha
               </label>
-              <input
-                type="password"
-                value={state.confirmPassword}
-                onChange={e => setState(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                placeholder="Repita a senha"
-                disabled={state.loading}
-                required
-                className={`w-full px-4 py-2.5 text-sm rounded-lg border-2 bg-dark-200 transition-all focus:outline-none ${
-                  state.confirmPassword.length === 0
-                    ? 'border-dark-200 text-gray-300 placeholder-gray-600'
-                    : state.newPassword === state.confirmPassword
-                    ? 'border-emerald-500 text-white'
-                    : 'border-red-500 text-white'
-                }`}
-              />
+              <div className="relative">
+                <input
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  value={state.confirmPassword}
+                  onChange={e => setState(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                  placeholder="Repita a senha"
+                  disabled={state.loading}
+                  required
+                  className={`w-full pl-4 pr-10 py-2.5 text-sm rounded-lg border-2 bg-dark-200 transition-all focus:outline-none ${
+                    state.confirmPassword.length === 0
+                      ? 'border-dark-200 text-gray-300 placeholder-gray-600'
+                      : state.newPassword === state.confirmPassword
+                      ? 'border-emerald-500 text-white'
+                      : 'border-red-500 text-white'
+                  }`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-violet-500 hover:text-violet-400 transition-colors"
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff className="w-4 h-4" />
+                  ) : (
+                    <Eye className="w-4 h-4" />
+                  )}
+                </button>
+              </div>
               {state.newPassword && state.confirmPassword && (
                 <small className={`block mt-2 text-xs font-medium ${
                   state.newPassword === state.confirmPassword ? 'text-emerald-400' : 'text-red-400'
