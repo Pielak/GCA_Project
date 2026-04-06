@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { Lock, Mail, CheckCircle2, AlertCircle, ArrowLeft } from 'lucide-react';
 
 interface ResetPasswordState {
   step: 'request' | 'verify' | 'confirm';
@@ -147,183 +148,175 @@ export const ResetPasswordPage: React.FC = () => {
   };
 
   return (
-    <div style={{ maxWidth: '500px', margin: '60px auto', padding: '20px' }}>
-      <div style={{ textAlign: 'center', marginBottom: '30px' }}>
-        <h1 style={{ fontSize: '28px', fontWeight: 'bold', marginBottom: '10px' }}>
-          🔐 Recuperar Senha
-        </h1>
-        <p style={{ color: '#666' }}>
-          {state.step === 'request' && 'Insira seu email para receber um link de recuperação'}
-          {state.step === 'confirm' && 'Digite sua nova senha'}
-        </p>
-      </div>
+    <div className="min-h-screen bg-dark-100 flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        {/* Back Button */}
+        <a href="/login" className="flex items-center gap-2 text-violet-500 hover:text-violet-400 text-sm font-medium mb-8">
+          <ArrowLeft className="w-4 h-4" />
+          Voltar para login
+        </a>
 
-      {state.error && (
-        <div
-          style={{
-            backgroundColor: '#fee',
-            border: '1px solid #fcc',
-            color: '#c00',
-            padding: '12px',
-            borderRadius: '8px',
-            marginBottom: '20px',
-          }}
-        >
-          {state.error}
-        </div>
-      )}
-
-      {state.success && (
-        <div
-          style={{
-            backgroundColor: '#efe',
-            border: '1px solid #cfc',
-            color: '#060',
-            padding: '12px',
-            borderRadius: '8px',
-            marginBottom: '20px',
-          }}
-        >
-          ✅ {state.success}
-        </div>
-      )}
-
-      {state.step === 'request' && (
-        <form onSubmit={handleRequestReset}>
-          <div style={{ marginBottom: '20px' }}>
-            <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '8px' }}>
-              Email
-            </label>
-            <input
-              type="email"
-              value={state.email}
-              onChange={e => setState(prev => ({ ...prev, email: e.target.value }))}
-              placeholder="seu@email.com"
-              style={{
-                width: '100%',
-                padding: '12px',
-                border: '1px solid #ddd',
-                borderRadius: '8px',
-                fontSize: '14px',
-                boxSizing: 'border-box',
-              }}
-              disabled={state.loading}
-              required
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={state.loading}
-            style={{
-              width: '100%',
-              padding: '12px',
-              backgroundColor: '#7c3aed',
-              color: 'white',
-              border: 'none',
-              borderRadius: '8px',
-              fontWeight: 'bold',
-              cursor: state.loading ? 'not-allowed' : 'pointer',
-              opacity: state.loading ? 0.6 : 1,
-            }}
-          >
-            {state.loading ? '⏳ Enviando...' : '📧 Enviar Link de Recuperação'}
-          </button>
-
-          <p style={{ textAlign: 'center', marginTop: '20px', color: '#666', fontSize: '12px' }}>
-            Lembrou sua senha? <a href="/login" style={{ color: '#7c3aed' }}>Faça login</a>
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-white mb-2">🔐 Recuperar Senha</h1>
+          <p className="text-gray-400">
+            {state.step === 'request' && 'Insira seu email para receber um link de recuperação'}
+            {state.step === 'confirm' && 'Defina sua nova senha'}
           </p>
-        </form>
-      )}
+        </div>
 
-      {state.step === 'confirm' && (
-        <form onSubmit={handleConfirmReset}>
-          <div style={{ marginBottom: '20px' }}>
-            <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '8px' }}>
-              Nova Senha
-            </label>
-            <input
-              type="password"
-              value={state.newPassword}
-              onChange={e => setState(prev => ({ ...prev, newPassword: e.target.value }))}
-              placeholder="Mínimo 10 caracteres, 1 maiúscula, 1 número, 1 caractere especial"
-              style={{
-                width: '100%',
-                padding: '12px',
-                border: '1px solid #ddd',
-                borderRadius: '8px',
-                fontSize: '14px',
-                boxSizing: 'border-box',
-              }}
-              disabled={state.loading}
-              required
-            />
-            {state.newPassword && (
-              <small
-                style={{
-                  display: 'block',
-                  marginTop: '8px',
-                  color: validatePasswordStrength(state.newPassword).valid ? '#060' : '#c00',
-                }}
-              >
-                {validatePasswordStrength(state.newPassword).valid ? '✅' : '❌'}{' '}
-                {validatePasswordStrength(state.newPassword).message}
-              </small>
-            )}
+        {/* Error Message */}
+        {state.error && (
+          <div className="bg-red-900/30 border border-red-500/50 text-red-300 px-4 py-3 rounded-lg mb-6 text-sm font-medium flex items-start gap-2">
+            <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+            {state.error}
           </div>
+        )}
 
-          <div style={{ marginBottom: '20px' }}>
-            <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '8px' }}>
-              Confirmar Senha
-            </label>
-            <input
-              type="password"
-              value={state.confirmPassword}
-              onChange={e => setState(prev => ({ ...prev, confirmPassword: e.target.value }))}
-              placeholder="Repita a senha"
-              style={{
-                width: '100%',
-                padding: '12px',
-                border: state.newPassword && state.newPassword !== state.confirmPassword ? '2px solid #c00' : '1px solid #ddd',
-                borderRadius: '8px',
-                fontSize: '14px',
-                boxSizing: 'border-box',
-              }}
-              disabled={state.loading}
-              required
-            />
-            {state.newPassword && state.confirmPassword && (
-              <small
-                style={{
-                  display: 'block',
-                  marginTop: '8px',
-                  color: state.newPassword === state.confirmPassword ? '#060' : '#c00',
-                }}
-              >
-                {state.newPassword === state.confirmPassword ? '✅ Senhas conferem' : '❌ Senhas não conferem'}
-              </small>
-            )}
+        {/* Success Message */}
+        {state.success && (
+          <div className="bg-emerald-900/30 border border-emerald-500/50 text-emerald-300 px-4 py-3 rounded-lg mb-6 text-sm font-medium flex items-start gap-2">
+            <CheckCircle2 className="w-4 h-4 flex-shrink-0 mt-0.5" />
+            {state.success}
           </div>
+        )}
 
-          <button
-            type="submit"
-            disabled={state.loading || !state.newPassword || state.newPassword !== state.confirmPassword}
-            style={{
-              width: '100%',
-              padding: '12px',
-              backgroundColor: '#7c3aed',
-              color: 'white',
-              border: 'none',
-              borderRadius: '8px',
-              fontWeight: 'bold',
-              cursor: state.loading ? 'not-allowed' : 'pointer',
-              opacity: state.loading ? 0.6 : 1,
-            }}
-          >
-            {state.loading ? '⏳ Alterando...' : '🔐 Alterar Senha'}
-          </button>
-        </form>
-      )}
+        {/* Request Email Step */}
+        {state.step === 'request' && (
+          <form onSubmit={handleRequestReset} className="space-y-5">
+            <div>
+              <label className="block text-sm font-semibold text-white mb-2">
+                Email
+              </label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-violet-500" />
+                <input
+                  type="email"
+                  value={state.email}
+                  onChange={e => setState(prev => ({ ...prev, email: e.target.value }))}
+                  placeholder="seu@email.com"
+                  disabled={state.loading}
+                  required
+                  className="w-full pl-10 pr-4 py-2.5 text-sm rounded-lg border-2 border-dark-200 bg-dark-200 text-white placeholder-gray-600 focus:outline-none focus:border-violet-500 transition-all"
+                />
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={state.loading}
+              className={`w-full py-2.5 rounded-lg text-sm font-semibold transition-all flex items-center justify-center gap-2 ${
+                !state.loading
+                  ? 'bg-violet-600 hover:bg-violet-700 text-white cursor-pointer'
+                  : 'bg-gray-700 text-gray-500 cursor-not-allowed'
+              }`}
+            >
+              {state.loading ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <span>Enviando...</span>
+                </>
+              ) : (
+                '📧 Enviar Link de Recuperação'
+              )}
+            </button>
+          </form>
+        )}
+
+        {/* Confirm Password Step */}
+        {state.step === 'confirm' && (
+          <form onSubmit={handleConfirmReset} className="space-y-5">
+            {/* New Password */}
+            <div>
+              <label className="block text-sm font-semibold text-white mb-2">
+                Nova Senha
+              </label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-violet-500" />
+                <input
+                  type="password"
+                  value={state.newPassword}
+                  onChange={e => setState(prev => ({ ...prev, newPassword: e.target.value }))}
+                  placeholder="Mínimo 10 caracteres"
+                  disabled={state.loading}
+                  required
+                  className={`w-full pl-10 pr-4 py-2.5 text-sm rounded-lg border-2 bg-dark-200 transition-all focus:outline-none ${
+                    state.newPassword.length === 0
+                      ? 'border-dark-200 text-gray-300 placeholder-gray-600'
+                      : validatePasswordStrength(state.newPassword).valid
+                      ? 'border-emerald-500 text-white'
+                      : 'border-red-500 text-white'
+                  }`}
+                />
+              </div>
+
+              {state.newPassword && (
+                <div className="mt-3 p-3 bg-dark-200 rounded-lg border border-dark-200 flex items-start gap-2">
+                  {validatePasswordStrength(state.newPassword).valid ? (
+                    <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
+                  ) : (
+                    <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
+                  )}
+                  <span className={`text-xs font-medium ${
+                    validatePasswordStrength(state.newPassword).valid ? 'text-emerald-400' : 'text-red-400'
+                  }`}>
+                    {validatePasswordStrength(state.newPassword).message}
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {/* Confirm Password */}
+            <div>
+              <label className="block text-sm font-semibold text-white mb-2">
+                Confirmar Senha
+              </label>
+              <input
+                type="password"
+                value={state.confirmPassword}
+                onChange={e => setState(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                placeholder="Repita a senha"
+                disabled={state.loading}
+                required
+                className={`w-full px-4 py-2.5 text-sm rounded-lg border-2 bg-dark-200 transition-all focus:outline-none ${
+                  state.confirmPassword.length === 0
+                    ? 'border-dark-200 text-gray-300 placeholder-gray-600'
+                    : state.newPassword === state.confirmPassword
+                    ? 'border-emerald-500 text-white'
+                    : 'border-red-500 text-white'
+                }`}
+              />
+              {state.newPassword && state.confirmPassword && (
+                <small className={`block mt-2 text-xs font-medium ${
+                  state.newPassword === state.confirmPassword ? 'text-emerald-400' : 'text-red-400'
+                }`}>
+                  {state.newPassword === state.confirmPassword ? '✅ Senhas conferem' : '❌ Senhas não conferem'}
+                </small>
+              )}
+            </div>
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={state.loading || !state.newPassword || state.newPassword !== state.confirmPassword}
+              className={`w-full py-2.5 rounded-lg text-sm font-semibold transition-all flex items-center justify-center gap-2 ${
+                !state.loading && state.newPassword && state.newPassword === state.confirmPassword
+                  ? 'bg-violet-600 hover:bg-violet-700 text-white cursor-pointer'
+                  : 'bg-gray-700 text-gray-500 cursor-not-allowed'
+              }`}
+            >
+              {state.loading ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <span>Alterando...</span>
+                </>
+              ) : (
+                '🔐 Alterar Senha'
+              )}
+            </button>
+          </form>
+        )}
+      </div>
     </div>
   );
 };
