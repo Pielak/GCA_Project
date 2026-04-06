@@ -390,6 +390,9 @@ Equipe GCA
         </html>
         """
 
+        observations_text = f"Observações Técnicas:\n{observations}\n" if observations else ""
+        restrictions_text = f"Restrições Técnicas:\n{restrictions}\n" if restrictions else ""
+
         text_content = f"""
 Seu Questionário foi Aprovado!
 
@@ -402,9 +405,7 @@ Resultado da Análise:
 - Stack Recomendado: {suggested_stack}
 - Próximo Passo: Inicie a ingestão de artefatos
 
-{f'Observações Técnicas:\n{observations}\n' if observations else ''}
-{f'Restrições Técnicas:\n{restrictions}\n' if restrictions else ''}
-
+{observations_text}{restrictions_text}
 Próximos Passos:
 1. Convide sua equipe: {project_link}/team
 2. Configure credenciais: {project_link}/credentials
@@ -664,6 +665,81 @@ IMPORTANTE:
 
 GCA — Gestão de Código Assistida
 Suporte: https://gca.com/support
+        """
+
+        return EmailService.send_email(
+            to_email=to_email,
+            subject=subject,
+            html_content=html_content,
+            text_content=text_content,
+        )
+
+    @staticmethod
+    def send_admin_invitation_email(
+        to_email: str,
+        invited_by_name: str,
+        temporary_password: str,
+        activation_link: str,
+    ) -> tuple[bool, Optional[str]]:
+        """
+        Send admin invitation email with temporary password.
+
+        Args:
+            to_email: Recipient email address
+            invited_by_name: Name of admin who invited this user
+            temporary_password: Temporary password (10 chars, 1 upper, 1 number, 1 special)
+            activation_link: Link to activate account
+
+        Returns:
+            (success, error_message)
+        """
+        subject = "🔐 Você foi convidado para o GCA - Gestão de Codificação Assistida"
+
+        html_content = f"""
+        <html>
+            <body style="font-family: Arial, sans-serif; background-color: #f5f3ff; margin: 0; padding: 20px;">
+                <div style="max-width: 600px; margin: 0 auto; background-color: white; border-radius: 12px; padding: 32px;">
+                    <h1 style="color: #2e1065; text-align: center;">Bem-vindo ao GCA!</h1>
+                    <p style="color: #333;">Você foi convidado por <strong>{invited_by_name}</strong> para ser administrador.</p>
+                    <div style="background-color: #fef3c7; padding: 16px; border-radius: 8px; margin: 20px 0;">
+                        <p style="margin: 0; color: #92400e;"><strong>Sua Senha Temporária:</strong></p>
+                        <p style="font-family: monospace; font-size: 18px; background: white; padding: 10px; text-align: center; margin: 10px 0;">{temporary_password}</p>
+                        <p style="margin: 0; color: #92400e; font-size: 12px;">⚠️ Expira em 24 horas</p>
+                    </div>
+                    <p style="color: #333;">Requisitos para senha permanente:</p>
+                    <ul style="color: #333;">
+                        <li>Mínimo 10 caracteres</li>
+                        <li>1 letra maiúscula</li>
+                        <li>1 número</li>
+                        <li>1 caractere especial (!@#$%^&*)</li>
+                    </ul>
+                    <div style="text-align: center; margin-top: 24px;">
+                        <a href="{activation_link}" style="background-color: #7c3aed; color: white; padding: 12px 32px; text-decoration: none; border-radius: 8px; display: inline-block;">
+                            Ativar Minha Conta
+                        </a>
+                    </div>
+                </div>
+            </body>
+        </html>
+        """
+
+        text_content = f"""
+Bem-vindo ao GCA!
+
+{invited_by_name} o convidou para ser administrador.
+
+Sua Senha Temporária: {temporary_password}
+(Expira em 24 horas)
+
+Requisitos para senha permanente:
+- Mínimo 10 caracteres
+- 1 letra maiúscula
+- 1 número
+- 1 caractere especial
+
+Ative sua conta: {activation_link}
+
+GCA — Gestão de Codificação Assistida
         """
 
         return EmailService.send_email(

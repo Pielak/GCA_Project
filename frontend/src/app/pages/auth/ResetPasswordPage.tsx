@@ -92,20 +92,20 @@ export const ResetPasswordPage: React.FC = () => {
     }
   };
 
-  const validatePasswordStrength = (password: string): { valid: boolean; message: string } => {
-    if (password.length < 10) {
-      return { valid: false, message: 'Mínimo 10 caracteres' };
-    }
-    if (!/[A-Z]/.test(password)) {
-      return { valid: false, message: 'Deve conter letra maiúscula' };
-    }
-    if (!/[0-9]/.test(password)) {
-      return { valid: false, message: 'Deve conter número' };
-    }
-    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
-      return { valid: false, message: 'Deve conter caractere especial' };
-    }
-    return { valid: true, message: 'Senha forte' };
+  const validatePasswordStrength = (password: string) => {
+    const hasMinLength = password.length >= 10;
+    const hasUppercase = /[A-Z]/.test(password);
+    const hasNumber = /[0-9]/.test(password);
+    const hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
+
+    return {
+      valid: hasMinLength && hasUppercase && hasNumber && hasSpecial,
+      hasMinLength,
+      hasUppercase,
+      hasNumber,
+      hasSpecial,
+      message: hasMinLength && hasUppercase && hasNumber && hasSpecial ? 'Senha forte ✅' : 'Preencha todos os requisitos'
+    };
   };
 
   const handleConfirmReset = async (e: React.FormEvent) => {
