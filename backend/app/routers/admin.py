@@ -4,14 +4,19 @@ Rotas de admin para gerenciar projetos e tenants
 """
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
-from uuid import UUID
-from pydantic import BaseModel
+from sqlalchemy import select
+from uuid import UUID, uuid4
+from pydantic import BaseModel, EmailStr
 import structlog
+import secrets
+import string
 
 from app.db.database import get_db
 from app.services.admin_service import AdminService
 from app.services.email_service import EmailService
 from app.middleware.auth import get_current_user_from_token
+from app.models.base import User
+from app.core.security import hash_password
 
 logger = structlog.get_logger(__name__)
 
@@ -42,6 +47,19 @@ class WebhookTestRequest(BaseModel):
     """Request to test a webhook integration"""
     integration_type: str  # teams, slack, discord
     webhook_url: str
+
+
+class InviteAdminRequest(BaseModel):
+    """Request to invite a new admin user"""
+    email: EmailStr
+    full_name: str
+
+
+class InviteAdminResponse(BaseModel):
+    """Response from admin invitation"""
+    success: bool
+    message: str
+    user_id: str = None
 
 
 # ========== PROJECT MANAGEMENT ==========
@@ -759,4 +777,152 @@ async def acknowledge_alert(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Error acknowledging alert"
+        )
+
+
+# ========== ADMIN USER MANAGEMENT ==========
+
+def generate_temporary_password() -> str:
+    """
+    Generate a temporary password that meets requirements:
+    - 10 characters minimum
+    - At least 1 uppercase letter
+    - At least 1 digit
+    - At least 1 special character
+    """
+    uppercase = string.ascii_uppercase
+    lowercase = string.ascii_lowercase
+    digits = string.digits
+    special = "!@#$%^&*"
+
+    password = (
+        secrets.choice(uppercase) +
+        secrets.choice(digits) +
+        secrets.choice(special) +
+        ''.join(secrets.choice(uppercase + lowercase + digits + special) for _ in range(7))
+    )
+
+    # Shuffle to randomize position
+    password_list = list(password)
+    secrets.SystemRandom().shuffle(password_list)
+
+    return ''.join(password_list)
+
+
+@router.post("/invite-admin", response_model=InviteAdminResponse)
+async def invite_admin_user(
+    request: InviteAdminRequest,
+    current_user_id: UUID = Depends(get_current_user_from_token),
+    db: AsyncSession = Depends(get_db)
+) -> InviteAdminResponse:
+    """
+    Invite a new admin user via email with temporary password.
+
+    Only admin users can invite other admins.
+
+    Args:
+        request: InviteAdminRequest with email and full_name
+        current_user_id: Current authenticated user ID (must be admin)
+        db: Database session
+
+    Returns:
+        InviteAdminResponse with success status and user_id
+    """
+    try:
+        # Fetch current user to verify admin status
+        stmt = select(User).where(User.id == current_user_id)
+        result = await db.execute(stmt)
+        current_user = result.scalar_one_or_none()
+
+        if not current_user or not current_user.is_admin:
+            logger.warning(
+                "admin.invite_admin_unauthorized",
+                user_id=str(current_user_id)
+            )
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Only admins can invite new admin users"
+            )
+
+        # Check if user already exists
+        stmt = select(User).where(User.email == request.email)
+        result = await db.execute(stmt)
+        existing_user = result.scalar_one_or_none()
+
+        if existing_user:
+            logger.warning(
+                "admin.invite_admin_user_exists",
+                email=request.email
+            )
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="User with this email already exists"
+            )
+
+        # Generate temporary password
+        temp_password = generate_temporary_password()
+
+        # Create new admin user
+        new_user = User(
+            id=uuid4(),
+            email=request.email,
+            full_name=request.full_name,
+            password_hash=hash_password(temp_password),
+            is_admin=True,
+            is_active=True,
+            first_access_completed=False,  # Force password change on first login
+        )
+
+        db.add(new_user)
+        await db.commit()
+        await db.refresh(new_user)
+
+        # Send invitation email
+        activation_link = f"https://gca.code-auditor.com.br/login"
+        invited_by_name = current_user.full_name or current_user.email or "Administrator"
+
+        success, error = EmailService.send_admin_invitation_email(
+            to_email=request.email,
+            invited_by_name=invited_by_name,
+            temporary_password=temp_password,
+            activation_link=activation_link
+        )
+
+        if not success:
+            logger.warning(
+                "admin.invite_admin_email_failed",
+                email=request.email,
+                error=error
+            )
+            # User created but email failed - inform admin
+            return InviteAdminResponse(
+                success=True,
+                message=f"User created but email failed: {error}",
+                user_id=str(new_user.id)
+            )
+
+        logger.info(
+            "admin.invite_admin_success",
+            email=request.email,
+            invited_by=invited_by_name,
+            user_id=str(new_user.id)
+        )
+
+        return InviteAdminResponse(
+            success=True,
+            message=f"Admin invitation sent to {request.email}. Temporary password expires in 24 hours.",
+            user_id=str(new_user.id)
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(
+            "admin.invite_admin_error",
+            error=str(e),
+            email=request.email
+        )
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Error inviting admin user"
         )
