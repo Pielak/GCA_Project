@@ -31,5 +31,9 @@ jobs:
     - name: Run tests
       run: |
         cd backend
-        poetry run pytest tests/ --cov=app || true
+        if [ -d "tests/" ]; then
+          poetry run pytest tests/ --cov=app
+        else
+          echo "⚠️ No tests directory found. Skipping tests."
+        fi
 
