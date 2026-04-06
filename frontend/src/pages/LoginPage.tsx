@@ -7,9 +7,9 @@ import { USERS } from '../data/mockData';
 export function LoginPage() {
   const navigate = useNavigate();
   const { setCurrentUser } = useAppStore();
-  const [email, setEmail] = useState('rafael@gca.dev');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [email, setEmail] = useState('pielak.ctba@gmail.com');
+  const [password, setPassword] = useState('Topazio01#');
+  const [confirmPassword, setConfirmPassword] = useState('Topazio01#');
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
 

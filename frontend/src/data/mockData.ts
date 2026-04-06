@@ -136,16 +136,7 @@ export interface Project {
 }
 
 export const USERS: User[] = [
-  { id: 'u1', name: 'Rafael Mendes', email: 'rafael@gca.dev', role: 'admin', active: true, createdAt: '2025-01-10' },
-  { id: 'u2', name: 'Carla Sousa', email: 'carla@gca.dev', role: 'gp', active: true, createdAt: '2025-01-15' },
-  { id: 'u3', name: 'Bruno Alves', email: 'bruno@gca.dev', role: 'tech_lead', active: true, createdAt: '2025-02-01' },
-  { id: 'u4', name: 'Fernanda Lima', email: 'fernanda@gca.dev', role: 'senior_dev', active: true, createdAt: '2025-02-10' },
-  { id: 'u5', name: 'Diego Costa', email: 'diego@gca.dev', role: 'pleno_dev', active: true, createdAt: '2025-02-15' },
-  { id: 'u6', name: 'Isabela Rocha', email: 'isabela@gca.dev', role: 'qa', active: true, createdAt: '2025-03-01' },
-  { id: 'u7', name: 'Marcos Pinto', email: 'marcos@gca.dev', role: 'compliance', active: true, createdAt: '2025-03-10' },
-  { id: 'u8', name: 'Ana Ferreira', email: 'ana@gca.dev', role: 'stakeholder', active: true, createdAt: '2025-03-15' },
-  { id: 'u9', name: 'Pedro Nunes', email: 'pedro@gca.dev', role: 'gp', active: true, createdAt: '2025-03-20' },
-  { id: 'u10', name: 'Juliana Melo', email: 'juliana@gca.dev', role: 'tech_lead', active: false, createdAt: '2025-04-01' },
+  { id: 'u1', name: 'Luiz Carlos Pielak', email: 'pielak.ctba@gmail.com', role: 'admin', active: true, createdAt: '2026-04-06' },
 ];
 
 const PILLARS: PillarScore[] = [

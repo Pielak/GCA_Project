@@ -25,31 +25,32 @@ async def create_mock_project():
 
     try:
         async with AsyncSessionLocal() as session:
-            # 1. Create admin and GP users
+            # 1. Create admin user only
             admin = User(
                 id=uuid4(),
-                email="admin@gca-mock.com",
-                password_hash=hash_password("admin123"),
-                full_name="Admin Mock",
+                email="pielak.ctba@gmail.com",
+                password_hash=hash_password("Topazio01#"),
+                full_name="Luiz Carlos Pielak",
                 is_active=True,
                 is_admin=True
             )
             session.add(admin)
 
+            # Create mock users for testing purposes only (not real production users)
             gp = User(
                 id=uuid4(),
-                email="gp@gca-mock.com",
-                password_hash=hash_password("gp123"),
-                full_name="GP Mock",
+                email="mock-gp@gca-test.com",
+                password_hash=hash_password("test123"),
+                full_name="Mock GP User",
                 is_active=True
             )
             session.add(gp)
 
             evaluator = User(
                 id=uuid4(),
-                email="evaluator@gca-mock.com",
-                password_hash=hash_password("eval123"),
-                full_name="Evaluator Mock",
+                email="mock-evaluator@gca-test.com",
+                password_hash=hash_password("test123"),
+                full_name="Mock Evaluator User",
                 is_active=True
             )
             session.add(evaluator)
